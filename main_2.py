@@ -18,8 +18,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 
-# Read the data and understanding our data set, assign your personal file path for the purpose of loading data
-product = pd.read_csv("/Users/ttonny0326/BA_ORRA/Python_Programming/Products_Information.csv")
+# Read the data and understanding our data set
+product = pd.read_csv("Products_Information.csv")
 
 
 # Using info() and head() functions to briefly read the overall structure

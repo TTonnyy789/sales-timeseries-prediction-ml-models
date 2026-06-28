@@ -12,8 +12,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 
-## Read the data and understanding our data set, assign your personal file path for the purpose of loading data
-product = pd.read_csv("/Users/ttonny0326/GitHub_Project/BA_ORRA_python_Grocery_prediction/Products_Information.csv")
+## Read the data and understanding our data set
+product = pd.read_csv("Products_Information.csv")
 
 
 ## Using info() and head() functions to briefly observe the overall pattern of the data
@@ -329,7 +329,7 @@ def divide_segments(segmented_data):
 
 ## Main script
 if __name__ == "__main__":
-    filepath = "/Users/ttonny0326/BA_ORRA/Python_Programming/Products_Information.csv"
+    filepath = "Products_Information.csv"
     product = load_and_process_data(filepath)
     segmented_data = segment_data(product)
     zero_sales_segments, non_zero_sales_segments = divide_segments(segmented_data)
@@ -360,7 +360,7 @@ if __name__ == "__main__":
 ### Plot the distribution of average sales for each store-product combination and the distribution of average sales range for each store-product combination to define the threshold for each group.
 
 ## Load the data
-non_product = pd.read_csv("/Users/ttonny0326/GitHub_Project/BA_ORRA_python_Grocery_prediction/non_zero_sales_segments.csv")
+non_product = pd.read_csv("non_zero_sales_segments.csv")
 
 ## Ensure 'product_type' is of categorical data type
 non_product['product_type'] = non_product['product_type'].astype('category')
@@ -456,7 +456,10 @@ plt.show()
 
 from forecasters import SalesForecaster, ZeroSalesForecaster
 
-###------------------------------------------------------------------------------- 
+SalesForecaster.load_data("Products_Information.csv")
+ZeroSalesForecaster.load_data("Products_Information.csv")
+
+###-------------------------------------------------------------------------------
 
 #%%#
 ### Step 7-1  ####################################################################
@@ -691,8 +694,8 @@ print(overall_average_relative_mae)
 ### Result visualization and evaluation by implementing the best model selection approach for each store-product combination
 
 ## Load the data from CSV files
-results_df_first_half = pd.read_csv("/Users/ttonny0326/GitHub_Project/BA_ORRA_python_Grocery_prediction/results_first_half.csv")
-results_df_second_half = pd.read_csv("/Users/ttonny0326/GitHub_Project/BA_ORRA_python_Grocery_prediction/results_second_half.csv")
+results_df_first_half = pd.read_csv("results_first_half.csv")
+results_df_second_half = pd.read_csv("results_second_half.csv")
 
 ## Concatenate the two dataframes
 results_df = pd.concat([results_df_first_half, results_df_second_half], ignore_index=True)

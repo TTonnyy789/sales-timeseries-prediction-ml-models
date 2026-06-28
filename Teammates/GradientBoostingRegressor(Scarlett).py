@@ -14,7 +14,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import accuracy_score, mean_squared_error, confusion_matrix, precision_score, recall_score, ConfusionMatrixDisplay, r2_score
 
 # Assuming you have prepared your dataset in a similar way as in the previous code
-product = pd.read_csv('C:\\Users\\sharo\\Dropbox\\PC\\Desktop\\Courses\\73701_Python\\Group Project\\code\\Products_Information\\Products_Information.csv')
+product = pd.read_csv('../Products_Information.csv')
 # Convert the 'date' column to datetime format and set it as the index
 product['date'] = pd.to_datetime(product['date'])
 product.set_index('date', inplace=True)

@@ -19,15 +19,19 @@ def process_segment(group):
     return group.loc[first_non_zero_index:]
 
 class ZeroSalesForecaster:
-    # Load the data from your local system
-    product = pd.read_csv("/Users/ttonny0326/BA_ORRA/Python_Programming/Products_Information.csv")
-    # Convert the 'date' column to datetime format and set it as the index
-    product['date'] = pd.to_datetime(product['date'])
-    product.set_index('date', inplace=True)
-    # Ensure 'product_type' is of categorical
-    product['product_type'] = product['product_type'].astype('category')
-    # Create a dictionary for storing the store-product data sets
+    product = None
     segmented_data = {}
+
+    @classmethod
+    def load_data(cls, filepath):
+        cls.product = pd.read_csv(filepath)
+        cls.product['date'] = pd.to_datetime(cls.product['date'])
+        cls.product.set_index('date', inplace=True)
+        cls.product['product_type'] = cls.product['product_type'].astype('category')
+        cls.segmented_data = {}
+        for (store, product_type), group in cls.product.groupby(['store_nbr', 'product_type'], observed=True):
+            cls.segmented_data[(store, product_type)] = group[['sales', 'special_offer', 'id']]
+
     def __init__(self, store_number, product_type, train_end_date='2016-07-31', validation_end_date='2017-07-31'):
         self.store_number = store_number
         self.product_type = product_type
@@ -68,26 +72,20 @@ class ZeroSalesForecaster:
 
 
 class SalesForecaster:
-    ## Load the data from your local system
-    product = pd.read_csv("/Users/ttonny0326/BA_ORRA/Python_Programming/Products_Information.csv")
-    ## Convert the 'date' column to datetime format and set it as the index
-    product['date'] = pd.to_datetime(product['date'])
-    product.set_index('date', inplace=True)
-    ## Ensure 'product_type' is of categorical
-    product['product_type'] = product['product_type'].astype('category')
-    ## Create a dictionary for storing the store-product data sets
+    product = None
     segmented_data = {}
 
-    #3 Function to process each segment if the data starts with zero sales units
-    def process_segment(group):
-        # Remove initial zero sales
-        first_non_zero_index = group['sales'].ne(0).idxmax()
-        return group.loc[first_non_zero_index:]
-    # Grouping the data by store and product
-    for (store, product_type), group in product.groupby(['store_nbr', 'product_type'], observed=True):
-        processed_group = process_segment(group)
-        segmented_data[(store, product_type)] = processed_group[['sales', 'special_offer', 'id', 'store_nbr']]
-    
+    @classmethod
+    def load_data(cls, filepath):
+        cls.product = pd.read_csv(filepath)
+        cls.product['date'] = pd.to_datetime(cls.product['date'])
+        cls.product.set_index('date', inplace=True)
+        cls.product['product_type'] = cls.product['product_type'].astype('category')
+        cls.segmented_data = {}
+        for (store, product_type), group in cls.product.groupby(['store_nbr', 'product_type'], observed=True):
+            processed_group = process_segment(group)
+            cls.segmented_data[(store, product_type)] = processed_group[['sales', 'special_offer', 'id', 'store_nbr']]
+
     def __init__(self, store_number, product_type, train_end_date='2016-07-31', validation_end_date='2017-07-31'):
         self.store_number = store_number
         self.product_type = product_type
@@ -131,18 +129,14 @@ class SalesForecaster:
             y_predict, Y_test_local, mae = prediction_function()
             if y_predict is not None and Y_test_local is not None:
                 model_mae[model_name] = (mae, y_predict)
-                nonlocal Y_test
-                Y_test = Y_test_local  # Update the Y_test in the outer scope
+                Y_test = Y_test_local
 
-        # Run each model and calculate MAE
-        if specific_segment['sales'].sum() == 0:
-            update_model_mae('Zero Sales Prediction', self.zero_sales_predict)
-        else:
-            update_model_mae('Linear Regression', self.linear_offer_date_predict)
-            update_model_mae('Random Forest', self.randomforest_offer_date_predict)
-            update_model_mae('LightGBM', self.lightgbm_offer_date_predict)
-            update_model_mae('XGBoost', self.xgboost_offer_date_predict)
-            update_model_mae('MLP Regression', self.mlp_regression_offer_date_predict)
+        # Run each model and record MAE
+        update_model_mae('Linear Regression', self.linear_offer_date_predict)
+        update_model_mae('Random Forest', self.randomforest_offer_date_predict)
+        update_model_mae('LightGBM', self.lightgbm_offer_date_predict)
+        update_model_mae('XGBoost', self.xgboost_offer_date_predict)
+        update_model_mae('MLP Regression', self.mlp_regression_offer_date_predict)
 
         # Select the model with the lowest MAE
         best_model, best_mae_y_predict = min(model_mae.items(), key=lambda x: x[1][0])
